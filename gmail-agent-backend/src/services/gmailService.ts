@@ -1,35 +1,71 @@
-import { getRefreshToken } from "../db/users";
-import { encrypt, decrypt } from "./crypto";
-import { env, ref } from "process";
 import { google } from "googleapis";
+import { getOAuth2ClientForUser } from "./oauthService"
 
-export async function fetchEmailsForUser(email: string) {
-    const encryptedToken = await getRefreshToken(email);
-    const refreshToken = decrypt(encryptedToken);
+/**
+ * Fetches the most recent emails for a user
+ * @param userEmail user's email
+ * @param maxResults optional limit (default 50)
+ */
+export async function fetchEmailsForUser(userEmail: string, maxResults = 50) {
+    const oauth2Client = await getOAuth2ClientForUser(userEmail);
+    const gmail = google.gmail({ version: "v1", auth: oauth2Client });
 
-    const oauth2Client = new google.auth.OAuth2(
-        env.GOOGLE_CLIENT_ID,
-        env.GOOGLE_CLIENT_SECRET,
-        env.GOOGLE_REDIRECT_URI
-    );
+    const messagesRes = await gmail.users.messages.list({ userId: "me", maxResults });
+    const emailContents: {
+        subject: string;
+        snippet: string;
+        id: string;
+        internalDate: number;
+    }[] = [];
 
-    oauth2Client.setCredentials({ refresh_token: refreshToken })
-    await oauth2Client.getAccessToken();
+    if (!messagesRes.data.messages) return emailContents;
 
+    for (const msg of messagesRes.data.messages) {
+        const fullMsg = await gmail.users.messages.get({ userId: "me", id: msg.id! });
+        const headers = fullMsg.data.payload?.headers || [];
+        const subject = headers.find(h => h.name === "Subject")?.value || "";
+        const snippet = fullMsg.data.snippet || "";
+        const internalDate = fullMsg.data.internalDate ? parseInt(fullMsg.data.internalDate) : 0;
 
-    const gmail = google.gmail({ version: "v1", auth: oauth2Client })
-    const messages = await gmail.users.messages.list({ userId: "me", maxResults: 50 })
-
-    // Fetch full content for each message
-    const emailContents = [];
-
-    if (messages.data.messages) {
-        for (const msg of messages.data.messages) {
-            const fullMsg = await gmail.users.messages.get({ userId: "me", id: msg.id! })
-            const subject = fullMsg.data.payload?.headers?.find(h => h.name === "Subject")?.value || ""
-            const snippet = fullMsg.data.snippet || ""
-            emailContents.push({ subject, snippet })
-        }
+        emailContents.push({ subject, snippet, id: msg.id!, internalDate });
     }
-    return emailContents
+
+    return emailContents;
+}
+
+/**
+ * Creates a Gmail label if it doesn't exist, returns label ID
+ */
+export async function createLabel(userEmail: string, labelName: string) {
+    const oauth2Client = await getOAuth2ClientForUser(userEmail);
+    const gmail = google.gmail({ version: "v1", auth: oauth2Client });
+
+    const res = await gmail.users.labels.list({ userId: "me" });
+    const existing = res.data.labels?.find(l => l.name === labelName);
+    if (existing) return existing.id!;
+
+    const newLabel = await gmail.users.labels.create({
+        userId: "me",
+        requestBody: {
+            name: labelName,
+            labelListVisibility: "labelShow",
+            messageListVisibility: "show",
+        },
+    });
+
+    return newLabel.data.id!;
+}
+
+/**
+ * Applies a label to a Gmail message
+ */
+export async function applyLabel(userEmail: string, messageId: string, labelId: string) {
+    const oauth2Client = await getOAuth2ClientForUser(userEmail);
+    const gmail = google.gmail({ version: "v1", auth: oauth2Client });
+
+    await gmail.users.messages.modify({
+        userId: "me",
+        id: messageId,
+        requestBody: { addLabelIds: [labelId] },
+    });
 }

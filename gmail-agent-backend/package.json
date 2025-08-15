@@ -14,6 +14,7 @@
     "@langchain/google-genai": "^0.2.16",
     "axios": "^1.11.0",
     "Buffer": "^0.0.0",
+    "cors": "^2.8.5",
     "crypto": "^1.0.1",
     "dotenv": "^17.2.1",
     "express": "^5.1.0",
@@ -23,6 +24,7 @@
     "pg": "^8.16.3"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
     "@types/node": "^24.3.0",
     "ts-node": "^10.9.2",
