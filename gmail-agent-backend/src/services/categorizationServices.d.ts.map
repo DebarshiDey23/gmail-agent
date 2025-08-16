@@ -1,0 +1,1 @@
+{"version":3,"file":"categorizationServices.d.ts","sourceRoot":"","sources":["categorizationServices.ts"],"names":[],"mappings":"AAIA,UAAU,gBAAgB;IACtB,QAAQ,EAAE,MAAM,CAAC;IACjB,MAAM,EAAE,GAAG,EAAE,CAAC;CACjB;AAED,wBAAsB,yBAAyB,CAC3C,MAAM,EAAE;IAAE,OAAO,EAAE,MAAM,CAAC;IAAC,OAAO,EAAE,MAAM,CAAA;CAAE,EAAE,EAC9C,OAAO,EAAE,MAAM,EAAE,+BAoEpB"}
