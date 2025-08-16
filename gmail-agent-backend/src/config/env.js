@@ -20,6 +20,6 @@ function requireEnv(name, fallback) {
 exports.env = {
     GOOGLE_CLIENT_ID: requireEnv('GOOGLE_CLIENT_ID', 'placeholder'),
     GOOGLE_CLIENT_SECRET: requireEnv('GOOGLE_CLIENT_SECRET', 'placeholder'),
-    GOOGLE_REDIRECT_URI: requireEnv('GOOGLE_REDIRECT_URI', 'http://localhost:3000/auth/google/callback')
+    GOOGLE_REDIRECT_URI: requireEnv('GOOGLE_REDIRECT_URI', 'https://gmail-agent-t5kd.onrender.com/auth/google/callback')
 };
 //# sourceMappingURL=env.js.map
