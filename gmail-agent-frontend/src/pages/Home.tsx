@@ -18,7 +18,7 @@ export default function Home() {
     return (
         <div style={{ textAlign: "center", marginTop: "100px" }}>
             <h1>Gmail Agent</h1>
-            <a href="https://gmail-agent-backend.onrender.com">
+            <a href="https://gmail-agent-backend.onrender.com/auth/google">
                 <button>Login with Google</button>
             </a>
         </div>

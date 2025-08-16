@@ -15,7 +15,7 @@ export default function Dashboard() {
         setLoading(true);
 
         try {
-            const response = await fetch("https://gmail-agent-backend.onrender.com", {
+            const response = await fetch("https://gmail-agent-backend.onrender.com/gmail/label", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 credentials: "include",  // ⚡ include credentials for cookies/auth

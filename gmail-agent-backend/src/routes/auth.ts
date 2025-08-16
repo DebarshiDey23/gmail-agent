@@ -44,7 +44,7 @@ router.get("/google/callback", async (req, res) => {
             await storeRefreshToken(email, encryptedToken);
         }
 
-        res.redirect(`http://localhost:5173/dashboard?loggedIn=true&email=${encodeURIComponent(email)}`);
+        res.redirect(`https://gmail-agent-t5kd.onrender.com/dashboard?loggedIn=true&email=${encodeURIComponent(email)}`);
     } catch (err) {
         console.error(err);
         res.status(500).send("OAuth error");
